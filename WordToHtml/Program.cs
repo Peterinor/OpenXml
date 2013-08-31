@@ -134,7 +134,7 @@ namespace WordToHtml
 			#endregion
 			_html.AddElement(div);
 
-			FileStream fs = new FileStream(file + ".html", FileMode.Truncate, FileAccess.Write);
+			FileStream fs = new FileStream(file + ".html", FileMode.OpenOrCreate, FileAccess.Write);
 			StreamWriter sw = new StreamWriter(fs);
 			sw.WriteLine(_html.GetHtml());
 			sw.Close();
