@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenXml_", "OpenXml_\OpenXm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordToHtml", "WordToHtml\WordToHtml.csproj", "{F182CEFF-F3CB-4EA3-8C8C-9D3C08472D4C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZipHelper", "ZipHelper\ZipHelper.csproj", "{666F2053-10E4-4AE8-AD41-972388E86425}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{F182CEFF-F3CB-4EA3-8C8C-9D3C08472D4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F182CEFF-F3CB-4EA3-8C8C-9D3C08472D4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F182CEFF-F3CB-4EA3-8C8C-9D3C08472D4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{666F2053-10E4-4AE8-AD41-972388E86425}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{666F2053-10E4-4AE8-AD41-972388E86425}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{666F2053-10E4-4AE8-AD41-972388E86425}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{666F2053-10E4-4AE8-AD41-972388E86425}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

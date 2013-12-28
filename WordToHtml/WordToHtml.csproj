@@ -34,7 +34,7 @@
   <ItemGroup>
     <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Open XML SDK\V2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
+      <HintPath>..\Libs\Open XML SDK\V2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -46,6 +46,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConvertConfig.cs" />
     <Compile Include="ElementHandler.cs" />
     <Compile Include="HtmlHelper.cs" />
     <Compile Include="OpenXMLHelper.cs" />
@@ -54,15 +55,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="DirectX_9_3D.docx">
+    <None Include="data\DirectX_9_3D.docx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="word.docx">
+    <None Include="data\word.docx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="HTMLPage.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ZipHelper\ZipHelper.csproj">
+      <Project>{666f2053-10e4-4ae8-ad41-972388e86425}</Project>
+      <Name>ZipHelper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

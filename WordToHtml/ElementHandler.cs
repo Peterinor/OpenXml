@@ -21,16 +21,16 @@ namespace WordToHtml
 			this.Document = doc;
 			this.MainPart = doc.MainDocumentPart;
 		}
-		public HtmlElement Handle(DocumentFormat.OpenXml.OpenXmlElement elem)
+		public HtmlElement Handle(DocumentFormat.OpenXml.OpenXmlElement elem, ConvertConfig config)
 		{
 			HtmlElement no = new HtmlElement("no");
 			if ((new Regex("Paragraph")).Match(elem.GetType().ToString()).Success)
 			{
-				return this.HandleParagraph((Paragraph)elem);
+                return this.HandleParagraph((Paragraph)elem, config);
 			}
 			else if ((new Regex("Table")).Match(elem.GetType().ToString()).Success)
 			{
-				return this.HandleTable((Table)elem);
+                return this.HandleTable((Table)elem, config);
 			}
 			else
 			{
@@ -38,7 +38,7 @@ namespace WordToHtml
 			}
 		}
 
-		public HtmlElement HandleParagraph(Paragraph p)
+		public HtmlElement HandleParagraph(Paragraph p, ConvertConfig ConConfig)
 		{
 			HtmlElement _pa = new HtmlElement("p");
 
@@ -107,7 +107,8 @@ namespace WordToHtml
 					var imgp = this.MainPart.GetPartById(ppp);
 
 					var img = new HtmlElement("img");
-					img.AddAttribute("src", imgp.Uri.ToString().Replace("/word/", "./"));
+                    //img.AddAttribute("src", imgp.Uri.ToString().Replace("/word/", "./"));
+                    img.AddAttribute("src", ConConfig.ResourcePath + imgp.Uri.ToString().Substring(1) );
 					span.AddChild(img);
 				}
 				_pa.AddChild(span);
@@ -117,7 +118,7 @@ namespace WordToHtml
 			return _pa;
 		}
 
-		public HtmlElement HandleTable(Table t)
+        public HtmlElement HandleTable(Table t, ConvertConfig ConConfig)
 		{
 			HtmlElement table = new HtmlElement("table");
 
@@ -135,7 +136,7 @@ namespace WordToHtml
 					var pars = tc.Elements<Paragraph>();
 					foreach (Paragraph p in pars)
 					{
-						h_td.AddChild(this.HandleParagraph(p));
+						h_td.AddChild(this.HandleParagraph(p, ConConfig));
 					}
 					h_tr.AddChild(h_td);
 				}
