@@ -34,7 +34,7 @@ namespace WordToHtml
         }
         public bool IsClose;
         public string TargetName { get; set; }
-        public string InnerHtml { get; set; }
+        public StringBuilder InnerHtml = new StringBuilder();// { get; set; }
         public List<HtmlAttribute> Attributes = new List<HtmlAttribute>();
         public void AddAttribute(HtmlAttribute att)
         {
@@ -48,11 +48,11 @@ namespace WordToHtml
         {
             this.Attributes.Add(new HtmlAttribute("style", s.GetStyle()));
         }
-        public List<HtmlElement> ChildElements = new List<HtmlElement>();
+        //public List<HtmlElement> ChildElements = new List<HtmlElement>();
         public void AddChild(HtmlElement child)
         {
-            this.ChildElements.Add(child);
-            this.InnerHtml += child.GetHtml();
+            //this.ChildElements.Add(child);
+            this.InnerHtml.Append(child.GetHtml());
         }
         public string GetHtml()
         {
@@ -65,7 +65,8 @@ namespace WordToHtml
             html.Append("<" + this.TargetName + attrs.ToString());
             if (this.IsClose)
             {
-                html.Append(">" + this.InnerHtml + "</" + this.TargetName + ">");
+                html.Append(">").Append(this.InnerHtml).Append("</").Append(this.TargetName).Append(">");
+                //html.Append(">" + this.InnerHtml + "</" + this.TargetName + ">");
             }
             else
             {
@@ -99,7 +100,7 @@ namespace WordToHtml
         public void AddStyle(CSS css)
         {
             HtmlElement c = new HtmlElement("style");
-            c.InnerHtml = css.GetCSS();
+            c.InnerHtml.Append(css.GetCSS());
             this.AddChild(c);
         }
         public void GetHtml()

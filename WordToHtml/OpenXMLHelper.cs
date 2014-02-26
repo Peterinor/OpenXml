@@ -33,16 +33,18 @@ namespace WordToHtml
 		}
 		public string GetStyle()
 		{
-			string _style = "";
+			StringBuilder _style = new StringBuilder();
 			foreach (string css in this.Styles.Keys)
 			{
-				_style += css + ":" + this.Styles[css] + ";";
+                _style.Append(css).Append(":").Append(this.Styles[css]).Append(";");
+                //_style += css + ":" + this.Styles[css] + ";";
 			}
 			if (!string.IsNullOrEmpty(this.Selector))
 			{
-				_style = this.Selector + "{" + _style + "}";
+                _style.Append(this.Selector).Append("{").Append(_style).Append("}");
+                //_style = this.Selector + "{" + _style + "}";
 			}
-			return _style;
+			return _style.ToString();
 		}
 		public void CombineStyles(CssStyle style)
 		{

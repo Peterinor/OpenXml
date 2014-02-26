@@ -89,7 +89,9 @@ namespace WordToHtml
 				foreach (Text t in ts)
 				{
 					var _s = new HtmlElement("span");
-					_s.InnerHtml = t.InnerText;
+                    //_s.InnerHtml = t.InnerText;
+                    _s.InnerHtml.Length = 0;
+                    _s.InnerHtml.Append(t.InnerText);
 					span.AddChild(_s);
 				}
 
