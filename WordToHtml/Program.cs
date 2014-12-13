@@ -1,9 +1,5 @@
-﻿//using DocumentFormat.OpenXml.Drawing;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Xml;
-using System.Xml.Linq;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using WordToHtml.Html;
@@ -15,43 +11,18 @@ namespace WordToHtml
     {
         static void Main(string[] args)
         {
-            //HtmlElement div = new HtmlElement("div");
-            //HtmlAttribute attr = new HtmlAttribute("style", "color:white");
-            //div.AddAttribute(attr);
-
-            //HtmlElement p = new HtmlElement("p");
-            //p.InnerHtml = "This is a Paragraph!";
-
-            //div.AddChild(p);
-            ////Console.WriteLine(div.GetHtml());
-
-            //HtmlHead head = new HtmlHead();
-            //head.AddStyleSheet("test.css");
-            ////head.AddStyle(
-            ////Console.WriteLine(head.GetHtml());
-
-            //HtmlPage page = new HtmlPage();
-            ////page.AddHeadElement(
-            ////page
-            //page.AddElement(div);
-            //page.AddElement(p);
-            //Console.WriteLine(page.GetHtml());
-
-            xMain(args);
-        }
-
-        static void xMain(string[] args)
-        {
             string file = "./data/word.docx";
             file = "./data/DirectX_9_3D.docx";
 
-            string ROOT = "./OUT/";
+            const string ROOT = "./OUT/";
 
             string fileMd5 = Utities.GetMD5(Path.GetFileName(file));
-            string docRoot = Path.Combine(new string[] { ROOT, fileMd5 + "/" });// ROOT + fileMd5 + "/";
+            string docRoot = Path.Combine(new[] { ROOT, fileMd5 + "/" });
 
-            ConvertConfig config = new ConvertConfig();
-            config.ResourcePath = "./" + fileMd5 + "/";
+            ConvertConfig config = new ConvertConfig
+            {
+                ResourcePath = "./" + fileMd5 + "/"
+            };
 
             if (!Directory.Exists(docRoot))
             {
@@ -64,7 +35,7 @@ namespace WordToHtml
 
             OpenXmlHelper helper = new OpenXmlHelper();
 
-            Html.Html _html = new Html.Html();
+            Html.Html html = new Html.Html();
 
             HtmlElement meta0 = new HtmlElement("meta", false);
             meta0.AddAttribute("http-equiv", "X-UA-Compatible");
@@ -82,10 +53,10 @@ namespace WordToHtml
             meta3.AddAttribute("http-equiv", "content-type");
             meta3.AddAttribute("content", "text/html; charset=UTF-8");
 
-            _html.AddHeadElement(meta0);
-            _html.AddHeadElement(meta1);
-            _html.AddHeadElement(meta2);
-            _html.AddHeadElement(meta3);
+            html.AddHeadElement(meta0);
+            html.AddHeadElement(meta1);
+            html.AddHeadElement(meta2);
+            html.AddHeadElement(meta3);
 
             CSS css = new CSS();
             CssStyle body = new CssStyle("body");
@@ -94,40 +65,36 @@ namespace WordToHtml
             center.AddStyle("text-align", "center");
             css.AddStyle(body);
             //css.AddStyle(center);
-            _html.AddStyle(css);
+            html.AddStyle(css);
 
             HtmlElement div = new HtmlElement("div");
-            HtmlAttribute div_class = new HtmlAttribute("class", "documentbody");
-            div.AddAttribute(div_class);
-            CssStyle div_style = new CssStyle();
-            div_style.AddStyle("font-family", "'Times New Roman' 宋体");
-            div_style.AddStyle("font-size", "10.5pt");
-            div_style.AddStyle("margin", "0 auto");
-            div_style.AddStyle("width", "600px");
-            div_style.AddStyle("padding", "100px 120px");
-            div_style.AddStyle("border", "2px solid gray");
-            div_style.AddStyle("background-color", "white");
+            HtmlAttribute divClass = new HtmlAttribute("class", "documentbody");
+            div.AddAttribute(divClass);
+            CssStyle divStyle = new CssStyle();
+            divStyle.AddStyle("font-family", "'Times New Roman' 宋体");
+            divStyle.AddStyle("font-size", "10.5pt");
+            divStyle.AddStyle("margin", "0 auto");
+            divStyle.AddStyle("width", "600px");
+            divStyle.AddStyle("padding", "100px 120px");
+            divStyle.AddStyle("border", "2px solid gray");
+            divStyle.AddStyle("background-color", "white");
 
-            div.AddStyle(div_style);
+            div.AddStyle(divStyle);
 
             #region docuemnt
 
             WordprocessingDocument doc = WordprocessingDocument.Open(file, false);
 
-            var mainPart = doc.MainDocumentPart;
-
             //StyleParts
             StylesPart docstyles = doc.MainDocumentPart.StyleDefinitionsPart == null
-                ? (StylesPart)doc.MainDocumentPart.StylesWithEffectsPart
+                ? doc.MainDocumentPart.StylesWithEffectsPart
                 : (StylesPart)doc.MainDocumentPart.StyleDefinitionsPart;
             var styles = docstyles.Styles;
             //styles
-            var __styles = styles.Elements<Style>();
+            var styleEl = styles.Elements<Style>();
             //var i = __styles.Count();
             //生产Style模版对应的CSS Style
-            _html.AddStyle(helper.GetStyles(__styles));
-
-            IEnumerable<Paragraph> ps = doc.MainDocumentPart.Document.Body.Elements<Paragraph>();
+            html.AddStyle(helper.GetStyles(styleEl));
 
             var pps = doc.MainDocumentPart.Document.Body.ChildElements;
 
@@ -141,38 +108,32 @@ namespace WordToHtml
             }
 
             #endregion
-            _html.AddElement(div);
+            html.AddElement(div);
 
-            FileStream fs;
             string htmlfile = ROOT + fileMd5 + ".html";
-            if (File.Exists(htmlfile))
-            {
-                fs = new FileStream(htmlfile, FileMode.Truncate, FileAccess.Write);
-            }else{
-                fs = new FileStream(htmlfile, FileMode.CreateNew, FileAccess.Write);
-            }
+            FileStream fs = File.Exists(htmlfile) 
+                ? new FileStream(htmlfile, FileMode.Truncate, FileAccess.Write) 
+                : new FileStream(htmlfile, FileMode.CreateNew, FileAccess.Write);
             StreamWriter sw = new StreamWriter(fs);
-            sw.WriteLine(_html.ToString());
+            sw.WriteLine(html.ToString());
             sw.Close();
             fs.Close();
 
-            //
-            XDocument _styles = null;
+            ////
+            //XDocument _styles = null;
 
-            if (docstyles != null)
-            {
-                using (var reader = XmlNodeReader.Create(docstyles.GetStream(FileMode.Open, FileAccess.Read)))
-                {
-                    _styles = XDocument.Load(reader);
-                }
+            //if (docstyles != null)
+            //{
+            //    using (var reader = XmlReader.Create(docstyles.GetStream(FileMode.Open, FileAccess.Read)))
+            //    {
+            //        _styles = XDocument.Load(reader);
+            //    }
 
-            }
-            if (_styles != null)
-            {
-                //Console.WriteLine(_styles.ToString());
-            }
-
-
+            //}
+            //if (_styles != null)
+            //{
+            //    //Console.WriteLine(_styles.ToString());
+            //}
         }
     }
 }

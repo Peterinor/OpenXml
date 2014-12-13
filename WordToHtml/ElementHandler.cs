@@ -8,11 +8,9 @@ namespace WordToHtml
 {
     public class ElementHandler
     {
-        WordprocessingDocument _document;
         readonly MainDocumentPart _mainPart;
         public ElementHandler(WordprocessingDocument doc)
         {
-            this._document = doc;
             this._mainPart = doc.MainDocumentPart;
         }
         public HtmlElement Handle(DocumentFormat.OpenXml.OpenXmlElement elem, ConvertConfig config)
@@ -22,39 +20,38 @@ namespace WordToHtml
             {
                 return this.HandleParagraph((Paragraph)elem, config);
             }
-            else if ((new Regex("Table")).Match(elem.GetType().ToString()).Success)
+            if ((new Regex("Table")).Match(elem.GetType().ToString()).Success)
             {
                 return this.HandleTable((Table)elem, config);
             }
-            else
-            {
-                return no;
-            }
+            return no;
         }
 
-        public HtmlElement HandleParagraph(Paragraph p, ConvertConfig ConConfig)
+        public HtmlElement HandleParagraph(Paragraph p, ConvertConfig conConfig)
         {
-            HtmlElement _pa = new HtmlElement("p");
+            HtmlElement pa = new HtmlElement("p");
 
             OpenXmlHelper helper = new OpenXmlHelper();
 
-            StyleConfig config = new StyleConfig();
-            config.Charset = "EastAsia";
+            StyleConfig config = new StyleConfig
+            {
+                Charset = "EastAsia"
+            };
 
             #region Paragraph
-            var p_class = "";
+            var pClass = "";
             if (p.ParagraphProperties != null)
             {
                 var pPr = p.ParagraphProperties;
-                _pa.AddStyle(helper.GetStyleFromParagraphProperties(pPr, config));
+                pa.AddStyle(helper.GetStyleFromParagraphProperties(pPr, config));
 
                 if (pPr.ParagraphStyleId != null)
                 {
                     var id = pPr.ParagraphStyleId.Val;
-                    p_class += "Inner_P_" + id;
+                    pClass += "Inner_P_" + id;
                 }
             }
-            _pa.AddAttribute("class", p_class);
+            pa.AddAttribute("class", pClass);
             //div.AddChild(_pa);
             var runs = p.Elements<Run>();
             foreach (var r in runs)
@@ -100,39 +97,36 @@ namespace WordToHtml
 
                     var img = new HtmlElement("img");
                     //img.AddAttribute("src", imgp.Uri.ToString().Replace("/word/", "./"));
-                    img.AddAttribute("src", ConConfig.ResourcePath + imgp.Uri.ToString().Substring(1));
+                    img.AddAttribute("src", conConfig.ResourcePath + imgp.Uri.ToString().Substring(1));
                     span.AddChild(img);
                 }
-                _pa.AddChild(span);
+                pa.AddChild(span);
 
             }
             #endregion
-            return _pa;
+            return pa;
         }
 
-        public HtmlElement HandleTable(Table t, ConvertConfig ConConfig)
+        public HtmlElement HandleTable(Table t, ConvertConfig conConfig)
         {
             HtmlElement table = new HtmlElement("table");
-
-            var tblPrs = t.Elements<TableProperties>();
-
 
             var trs = t.Elements<TableRow>();
             foreach (TableRow tr in trs)
             {
-                HtmlElement h_tr = new HtmlElement("tr");
+                HtmlElement hTr = new HtmlElement("tr");
                 var tcs = tr.Elements<TableCell>();
                 foreach (TableCell tc in tcs)
                 {
-                    HtmlElement h_td = new HtmlElement("td");
+                    HtmlElement hTd = new HtmlElement("td");
                     var pars = tc.Elements<Paragraph>();
                     foreach (Paragraph p in pars)
                     {
-                        h_td.AddChild(this.HandleParagraph(p, ConConfig));
+                        hTd.AddChild(this.HandleParagraph(p, conConfig));
                     }
-                    h_tr.AddChild(h_td);
+                    hTr.AddChild(hTd);
                 }
-                table.AddChild(h_tr);
+                table.AddChild(hTr);
             }
             return table;
         }
