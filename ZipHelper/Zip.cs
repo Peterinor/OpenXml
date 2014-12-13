@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using System.IO;
 
 using ICSharpCode.SharpZipLib.Checksums;
 using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.GZip;
 
 namespace ZipHelper
 {
@@ -15,39 +10,32 @@ namespace ZipHelper
     public class Zip
     {
 
-        public void ZipFile(string FileToZip, string ZipedFile, int CompressionLevel, int BlockSize)
+        public void ZipFile(string fileToZip, string zipedFile, int compressionLevel, int blockSize)
         {
             //如果文件没有找到，则报错
-            if (!System.IO.File.Exists(FileToZip))
+            if (!File.Exists(fileToZip))
             {
-                throw new System.IO.FileNotFoundException("The specified file " + FileToZip + " could not be found. Zipping aborderd");
+                throw new FileNotFoundException("The specified file " + fileToZip + " could not be found. Zipping aborderd");
             }
 
-            System.IO.FileStream StreamToZip = new System.IO.FileStream(FileToZip, System.IO.FileMode.Open, System.IO.FileAccess.Read);
-            System.IO.FileStream ZipFile = System.IO.File.Create(ZipedFile);
-            ZipOutputStream ZipStream = new ZipOutputStream(ZipFile);
-            ZipEntry ZipEntry = new ZipEntry("ZippedFile");
-            ZipStream.PutNextEntry(ZipEntry);
-            ZipStream.SetLevel(CompressionLevel);
-            byte[] buffer = new byte[BlockSize];
-            System.Int32 size = StreamToZip.Read(buffer, 0, buffer.Length);
-            ZipStream.Write(buffer, 0, size);
-            try
+            FileStream streamToZip = new FileStream(fileToZip, FileMode.Open, FileAccess.Read);
+            FileStream zipFile = File.Create(zipedFile);
+            ZipOutputStream zipStream = new ZipOutputStream(zipFile);
+            ZipEntry zipEntry = new ZipEntry("ZippedFile");
+            zipStream.PutNextEntry(zipEntry);
+            zipStream.SetLevel(compressionLevel);
+            byte[] buffer = new byte[blockSize];
+            Int32 size = streamToZip.Read(buffer, 0, buffer.Length);
+            zipStream.Write(buffer, 0, size);
+            while (size < streamToZip.Length)
             {
-                while (size < StreamToZip.Length)
-                {
-                    int sizeRead = StreamToZip.Read(buffer, 0, buffer.Length);
-                    ZipStream.Write(buffer, 0, sizeRead);
-                    size += sizeRead;
-                }
+                int sizeRead = streamToZip.Read(buffer, 0, buffer.Length);
+                zipStream.Write(buffer, 0, sizeRead);
+                size += sizeRead;
             }
-            catch (System.Exception ex)
-            {
-                throw ex;
-            }
-            ZipStream.Finish();
-            ZipStream.Close();
-            StreamToZip.Close();
+            zipStream.Finish();
+            zipStream.Close();
+            streamToZip.Close();
         }
 
         public void ZipToFile(string dir, string zipfile)
@@ -66,9 +54,11 @@ namespace ZipHelper
 
                 byte[] buffer = new byte[fs.Length];
                 fs.Read(buffer, 0, buffer.Length);
-                ZipEntry entry = new ZipEntry(file);
-
-                entry.DateTime = DateTime.Now;
+                ZipEntry entry = new ZipEntry(file)
+                {
+                    DateTime = DateTime.Now,
+                    Size = fs.Length
+                };
 
                 // set Size and the crc, because the information
                 // about the size and crc should be stored in the header
@@ -76,7 +66,6 @@ namespace ZipHelper
                 // (in this case size == crc == -1 in the header)
                 // Some ZIP programs have problems with zip files that don't store
                 // the size and crc in the header.
-                entry.Size = fs.Length;
                 fs.Close();
 
                 crc.Reset();

@@ -1,37 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Security.Cryptography;
 using System.Text;
-
-using System.Security.Cryptography;
 
 namespace ZipHelper
 {
     public class Utities
     {
-        public static string GetMD5(string sDataIn)
+        public static string GetMd5(string sDataIn)
         {
 
             MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
 
-            byte[] bytValue, bytHash;
+            byte[] bytValue = Encoding.UTF8.GetBytes(sDataIn);
 
-            bytValue = System.Text.Encoding.UTF8.GetBytes(sDataIn);
-
-            bytHash = md5.ComputeHash(bytValue);
+            byte[] bytHash = md5.ComputeHash(bytValue);
 
             md5.Clear();
 
-            string sTemp = "";
+            StringBuilder sTemp = new StringBuilder();
 
-            for (int i = 0; i < bytHash.Length; i++)
+            foreach (byte t in bytHash)
             {
-
-                sTemp += bytHash[i].ToString("X").PadLeft(2, '0');
-
+                sTemp.Append(t.ToString("X").PadLeft(2, '0'));
             }
 
-            return sTemp.ToLower();
+            return sTemp.ToString().ToLower();
 
         }
 

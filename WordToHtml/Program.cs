@@ -16,7 +16,7 @@ namespace WordToHtml
 
             const string ROOT = "./OUT/";
 
-            string fileMd5 = Utities.GetMD5(Path.GetFileName(file));
+            string fileMd5 = Utities.GetMd5(Path.GetFileName(file));
             string docRoot = Path.Combine(new[] { ROOT, fileMd5 + "/" });
 
             ConvertConfig config = new ConvertConfig

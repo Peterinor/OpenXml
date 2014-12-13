@@ -1,16 +1,6 @@
 ﻿using System;
-using System.Text;
-using System.Collections;
 using System.IO;
-using System.Diagnostics;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Data;
-
-using ICSharpCode.SharpZipLib.BZip2;
 using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Zip.Compression;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using ICSharpCode.SharpZipLib.GZip;
 
 namespace ZipHelper
 {
@@ -26,7 +16,7 @@ namespace ZipHelper
 
                 string directoryName = Path.GetDirectoryName(dir);
                 string fileName = Path.GetFileName(theEntry.Name);
-                
+
                 //生成解压目录
                 Directory.CreateDirectory(directoryName);
 
