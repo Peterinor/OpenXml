@@ -1,21 +1,12 @@
-﻿using System;
+﻿//using DocumentFormat.OpenXml.Drawing;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+using System.IO;
 using System.Xml;
 using System.Xml.Linq;
-using System.IO;
-
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Wordprocessing;
-using DocumentFormat.OpenXml.Office2010;
 using DocumentFormat.OpenXml.Packaging;
-//using DocumentFormat.OpenXml.Drawing;
-
-using System.Text.RegularExpressions;
-
+using DocumentFormat.OpenXml.Wordprocessing;
+using WordToHtml.Html;
 using ZipHelper;
 
 namespace WordToHtml
@@ -71,9 +62,9 @@ namespace WordToHtml
 
             Console.WriteLine("Convert Word to Html");
 
-            OpenXMLHelper helper = new OpenXMLHelper();
+            OpenXmlHelper helper = new OpenXmlHelper();
 
-            HtmlPage _html = new HtmlPage();
+            Html.Html _html = new Html.Html();
 
             HtmlElement meta0 = new HtmlElement("meta", false);
             meta0.AddAttribute("http-equiv", "X-UA-Compatible");
@@ -146,7 +137,6 @@ namespace WordToHtml
             foreach (var pp in pps)
             {
                 //Console.WriteLine(pp.GetType().ToString());
-
                 div.AddChild(handler.Handle(pp, config));
             }
 
@@ -162,7 +152,7 @@ namespace WordToHtml
                 fs = new FileStream(htmlfile, FileMode.CreateNew, FileAccess.Write);
             }
             StreamWriter sw = new StreamWriter(fs);
-            sw.WriteLine(_html.GetHtml());
+            sw.WriteLine(_html.ToString());
             sw.Close();
             fs.Close();
 

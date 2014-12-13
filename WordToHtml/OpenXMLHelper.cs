@@ -1,89 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Wordprocessing;
-using DocumentFormat.OpenXml.Office2010;
-using DocumentFormat.OpenXml.Packaging;
+using WordToHtml.Html;
 
 namespace WordToHtml
 {
-	public class StyleConfig
-	{
-		public string Charset { get; set; }
-	}
-	public class StyleBudle
-	{
-
-	}
-	public class CssStyle
-	{
-		public string Selector;
-		public Dictionary<string, string> Styles = new Dictionary<string, string>();
-		public CssStyle(string selector = null)
-		{
-			this.Selector = selector;
-		}
-		public void AddStyle(string name, string value)
-		{
-			this.Styles.Add(name, value);
-		}
-		public string GetStyle()
-		{
-			StringBuilder _style = new StringBuilder();
-			foreach (string css in this.Styles.Keys)
-			{
-                _style.Append(css).Append(":").Append(this.Styles[css]).Append(";");
-                //_style += css + ":" + this.Styles[css] + ";";
-			}
-			if (!string.IsNullOrEmpty(this.Selector))
-			{
-                _style.Append(this.Selector).Append("{").Append(_style).Append("}");
-                //_style = this.Selector + "{" + _style + "}";
-			}
-			return _style.ToString();
-		}
-		public void CombineStyles(CssStyle style)
-		{
-			foreach (string k in style.Styles.Keys)
-			{
-				if (this.Styles.Keys.Contains(k))
-				{
-					//this.Styles[k] += style.Styles[k];
-					this.Styles[k] = style.Styles[k];
-				}
-				else
-				{
-					this.Styles.Add(k, style.Styles[k]);
-				}
-			}
-		}
-	}
-	public class CSS
-	{
-		public List<CssStyle> styles = new List<CssStyle>();
-		public void AddStyle(CssStyle s)
-		{
-			if (!string.IsNullOrEmpty(s.Selector))
-			{
-				this.styles.Add(s);
-			}
-			//Error
-		}
-		public string GetCSS()
-		{
-			var _css = "";
-			for (var i = 0; i < this.styles.Count; i++)
-			{
-				_css += this.styles[i].GetStyle();
-			}
-			return _css;
-		}
-	}
-	public class OpenXMLHelper
+    public class OpenXmlHelper
 	{
 		public CSS GetStyles(IEnumerable<Style> styles)
 		{
@@ -93,20 +15,20 @@ namespace WordToHtml
 			{
 				var id = s.StyleId;
 				var type = s.Type.ToString();
-				Style linked_s = null;
+				Style linkedS = null;
 				if (s.LinkedStyle != null)
 				{
-					var linked_id = s.LinkedStyle.Val;
-					var s_1 = from ls in styles
-							  where ls.StyleId.Value == linked_id
+					var linkedId = s.LinkedStyle.Val;
+					var s1 = from ls in styles
+							  where ls.StyleId.Value == linkedId
 							  select ls;
-					var k = s_1.Count();
+					var k = s1.Count();
 					if (k > 0)
 					{
-						linked_s = s_1.ElementAt(0);
+						linkedS = s1.ElementAt(0);
 					}
 				}
-				css.AddStyle(this.GetStyle(s, linked_s));
+				css.AddStyle(this.GetStyle(s, linkedS));
 			}
 			return css;
 		}
@@ -130,32 +52,32 @@ namespace WordToHtml
 			{
 				if (s.StyleParagraphProperties != null)
 				{
-					CssStyle c_s = this.GetStyleFromParagraphProperties(new ParagraphProperties(s.StyleParagraphProperties.OuterXml), config);
-					c_s.Selector = ".Inner_P_" + id;
+					CssStyle cS = this.GetStyleFromParagraphProperties(new ParagraphProperties(s.StyleParagraphProperties.OuterXml), config);
+					cS.Selector = ".Inner_P_" + id;
 					if (s.StyleRunProperties != null)
 					{
-						CssStyle c_ss = this.GetStyleFromRunProperties(new RunProperties(s.StyleRunProperties.OuterXml), config);
-						c_s.CombineStyles(c_ss);
+						CssStyle cSs = this.GetStyleFromRunProperties(new RunProperties(s.StyleRunProperties.OuterXml), config);
+						cS.CombineStyles(cSs);
 					}
-					return c_s;
+					return cS;
 				}
 			}
 			else if (type == "character")
 			{
 				if (s.StyleRunProperties != null)
 				{
-					CssStyle c_s = this.GetStyleFromRunProperties(new RunProperties(s.StyleRunProperties.OuterXml), config);
-					c_s.Selector = ".Inner_R_" + id;
-					return c_s;
+					CssStyle cS = this.GetStyleFromRunProperties(new RunProperties(s.StyleRunProperties.OuterXml), config);
+					cS.Selector = ".Inner_R_" + id;
+					return cS;
 				}
 			}
 			else if (type == "table")
 			{
 				if (s.StyleTableProperties != null)
 				{
-					CssStyle c_s = this.GetStyleFromTableProperties(new TableProperties(s.StyleTableProperties.OuterXml), config);
-					c_s.Selector = ".Inner_T_" + id;
-					return c_s;
+					CssStyle cS = this.GetStyleFromTableProperties(new TableProperties(s.StyleTableProperties.OuterXml), config);
+					cS.Selector = ".Inner_T_" + id;
+					return cS;
 				}
 			}
 			else if (type == "numbering")
@@ -170,7 +92,7 @@ namespace WordToHtml
 
 		public CssStyle GetStyleFromRunProperties(RunProperties r, StyleConfig config = null)
 		{
-			CssStyle _style = new CssStyle(null);
+			CssStyle style = new CssStyle(null);
 			var rPr = r;
 			if (rPr != null)
 			{
@@ -184,7 +106,7 @@ namespace WordToHtml
 							{
 								var fs = (rPr.RunFonts.Ascii != null ? rPr.RunFonts.Ascii.Value : "nofont")
 								+ "," + (rPr.RunFonts.HighAnsi != null ? rPr.RunFonts.HighAnsi.Value : "nofont");
-								_style.AddStyle("font-family", fs);
+								style.AddStyle("font-family", fs);
 							}
 						}
 						if (config.Charset == "EastAsia")
@@ -192,7 +114,7 @@ namespace WordToHtml
 							if (rPr.RunFonts.EastAsia != null)
 							{
 								var fs = (rPr.RunFonts.EastAsia != null ? rPr.RunFonts.EastAsia.Value : "nofont");
-								_style.AddStyle("font-family", fs);
+								style.AddStyle("font-family", fs);
 							}
 						}
 					}
@@ -201,51 +123,49 @@ namespace WordToHtml
 						var fs = (rPr.RunFonts.Ascii != null ? rPr.RunFonts.Ascii.Value : "nofont")
 						+ "," + (rPr.RunFonts.HighAnsi != null ? rPr.RunFonts.HighAnsi.Value : "nofont")
 						+ "," + (rPr.RunFonts.EastAsia != null ? rPr.RunFonts.EastAsia.Value : "nofont");
-						_style.AddStyle("font-family", fs);
+						style.AddStyle("font-family", fs);
 					}
 				}
 				if (rPr.FontSize != null && rPr.FontSize.Val != null)
 				{
-					_style.AddStyle("font-size", rPr.FontSize.Val + "px");
+					style.AddStyle("font-size", rPr.FontSize.Val + "px");
 				}
 				if (rPr.Bold != null)
 				{
 					if (rPr.Bold.Val != null && rPr.Bold.Val.Value)
 					{
-						_style.AddStyle("font-weight", "bold");
+						style.AddStyle("font-weight", "bold");
 					}
 				}
 				if (rPr.Color != null)
 				{
-					_style.AddStyle("color", "#" + rPr.Color.Val);
+					style.AddStyle("color", "#" + rPr.Color.Val);
 				}
 			}
 
-			return _style;
+			return style;
 		}
 
 		public CssStyle GetStyleFromParagraphProperties(ParagraphProperties p, StyleConfig config = null)
 		{
-			CssStyle _style = new CssStyle(null);
+			CssStyle style = new CssStyle(null);
 			var pPr = p;
 			if (pPr != null)
 			{
 				if (pPr.Justification != null)
 				{
 					var jc = pPr.Justification;
-					_style.AddStyle("text-align", jc.Val);
+					style.AddStyle("text-align", jc.Val);
 				}
-				//pPr.ParagraphMarkRunProperties;
-
 				if (pPr.ParagraphMarkRunProperties != null)
 				{
 					RunProperties rPr = new RunProperties(pPr.ParagraphMarkRunProperties.OuterXml);
 					CssStyle p_s = this.GetStyleFromRunProperties(rPr, config);
-					_style.CombineStyles(p_s);
+					style.CombineStyles(p_s);
 				}
 
 			}
-			return _style;
+			return style;
 		}
 
 		public CssStyle GetStyleFromTableProperties(TableProperties r, StyleConfig config = null)

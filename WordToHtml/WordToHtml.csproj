@@ -48,7 +48,15 @@
   <ItemGroup>
     <Compile Include="ConvertConfig.cs" />
     <Compile Include="ElementHandler.cs" />
-    <Compile Include="HtmlHelper.cs" />
+    <Compile Include="Html\CSS.cs" />
+    <Compile Include="Html\CssStyle.cs" />
+    <Compile Include="Html\Html.cs" />
+    <Compile Include="Html\HtmlAttribute.cs" />
+    <Compile Include="Html\HtmlBody.cs" />
+    <Compile Include="Html\HtmlElement.cs" />
+    <Compile Include="Html\HtmlHead.cs" />
+    <Compile Include="Html\HtmlHelper.cs" />
+    <Compile Include="Html\StyleConfig.cs" />
     <Compile Include="OpenXMLHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
